@@ -79,6 +79,10 @@ def main():
         "Price",
         "Value",
         "Percentage",
+        "recommendationKey",
+        "trailingPE",
+        "targetMeanPrice",
+        "upside%",
         "Source",
     ]
     for col in cols:
@@ -88,6 +92,11 @@ def main():
     print(f"Excluded: {excluded}")
     total_cap_used = 0
     for symbol, data in report.items():
+        ticker = yf.Ticker(symbol)
+        recommendation_key = ticker.info.get("recommendationKey")
+        trailing_pe = ticker.info.get("trailingPE")
+        target_mean_price = ticker.info.get("targetMeanPrice")
+        upside = (target_mean_price - data["price"]) / data["price"] * 100
         symbol = symbol.split(".")[0]
         stock_url = f"{SETTRADE_QUOTE_URL}/{symbol}/overview"
         table.add_row(
@@ -96,8 +105,11 @@ def main():
             f"{data['price']:.2f}",
             f"{data['value']:,.2f}",
             f"{data['percentage']:.2f}",
+            recommendation_key,
+            f"{trailing_pe:.2f}",
+            f"{target_mean_price:.2f}",
+            f"{upside:.2f}",
             f"[link={stock_url}][green]SETTRADE[/green][/link]",
-
         )
         total_cap_used += data["value"]
     console.print(table)
