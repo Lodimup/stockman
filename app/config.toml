@@ -1,0 +1,8 @@
+# Money to invest, used to calculate discreet amount of shares to buy
+capital = 1000000
+risk_free_rate = 0.015
+
+# List of stocks to avoid
+blacklists = [
+    "DELTA",
+]
