@@ -32,4 +32,4 @@ def simple_backtest(
     for k, v in allocation.items():
         gain += (sell_prices[k] - buy_prices[k]) * v
 
-    return gain + leftover
+    return gain
