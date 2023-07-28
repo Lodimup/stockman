@@ -6,12 +6,11 @@ import yfinance as yf
 from pypfopt import EfficientFrontier, expected_returns, risk_models
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from rich import print
+from rich.table import Table
 from services.backtests.batch_simple_backtest import batch_simple_backtest
+from services.console import console
 from services.read_cfg import read_cfg
 from services.set100 import symbols
-from services.console import console
-from rich.table import Table
-
 
 CFG = read_cfg()
 RISK_FREE_RATE = CFG["risk_free_rate"]
@@ -44,7 +43,9 @@ def main():
     weights = ef.max_sharpe(risk_free_rate=RISK_FREE_RATE)
     cleaned_weights = ef.clean_weights()
     latest_prices = get_latest_prices(df)
-    da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=CFG["capital"])
+    da = DiscreteAllocation(
+        weights, latest_prices, total_portfolio_value=CFG["capital"]
+    )
     allocation, leftover = da.lp_portfolio()
     allocation = {k: v for k, v in allocation.items() if v > 0}
 
@@ -71,7 +72,13 @@ def main():
         print(f'Backtest result saved to "{backtest_save_path}')
     # Report allocation
     table = Table(title="Allocation")
-    cols = ["Symbol", "Share", "Price", "Value", "Percentage"]
+    cols = [
+        "Symbol",
+        "Share",
+        "Price",
+        "Value",
+        "Percentage",
+    ]
     for col in cols:
         table.add_column(col)
     print("-" * 80)
@@ -79,7 +86,13 @@ def main():
     print(f"Excluded: {excluded}")
     total_cap_used = 0
     for symbol, data in report.items():
-        table.add_row(symbol, f"{data['share']:.0f}", f"{data['price']:.2f}", f"{data['value']:,.2f}", f"{data['percentage']:.2f}")
+        table.add_row(
+            symbol,
+            f"{data['share']:.0f}",
+            f"{data['price']:.2f}",
+            f"{data['value']:,.2f}",
+            f"{data['percentage']:.2f}",
+        )
         total_cap_used += data["value"]
     console.print(table)
     print("-" * 80)
