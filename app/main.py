@@ -16,6 +16,7 @@ CFG = read_cfg()
 RISK_FREE_RATE = CFG["risk_free_rate"]
 BLACKLISTS = CFG["blacklists"]
 OUT_PREFIX = int(time.time())
+SETTRADE_QUOTE_URL = 'https://www.settrade.com/th/equities/quote'
 
 
 def main():
@@ -56,7 +57,7 @@ def main():
             "price": latest_prices[symbol],
             "share": share,
             "value": latest_prices[symbol] * share,
-            "percentage": cleaned_weights[symbol],
+            "percentage": cleaned_weights[symbol]
         }
 
     # Backtest
@@ -78,6 +79,7 @@ def main():
         "Price",
         "Value",
         "Percentage",
+        "Source",
     ]
     for col in cols:
         table.add_column(col)
@@ -86,12 +88,15 @@ def main():
     print(f"Excluded: {excluded}")
     total_cap_used = 0
     for symbol, data in report.items():
+        stock_url = SETTRADE_QUOTE_URL + "/" + symbol.split(".")[0] + "/" + "overview"
         table.add_row(
             symbol,
             f"{data['share']:.0f}",
             f"{data['price']:.2f}",
             f"{data['value']:,.2f}",
             f"{data['percentage']:.2f}",
+            f"[link={stock_url}][green]SETTRADE[/green][/link]",
+
         )
         total_cap_used += data["value"]
     console.print(table)
