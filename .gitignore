@@ -210,3 +210,4 @@ pyrightconfig.json
 playground
 app/out/*
 app/config.toml
+app/data/*
