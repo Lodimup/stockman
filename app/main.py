@@ -88,7 +88,8 @@ def main():
     print(f"Excluded: {excluded}")
     total_cap_used = 0
     for symbol, data in report.items():
-        stock_url = SETTRADE_QUOTE_URL + "/" + symbol.split(".")[0] + "/" + "overview"
+        symbol = symbol.split(".")[0]
+        stock_url = f"{SETTRADE_QUOTE_URL}/{symbol}/overview"
         table.add_row(
             symbol,
             f"{data['share']:.0f}",
