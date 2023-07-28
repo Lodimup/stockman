@@ -92,9 +92,11 @@ def main():
     print(f"Excluded: {excluded}")
     total_cap_used = 0
     for symbol, data in report.items():
+        if data["share"] <= 1:
+            continue
         ticker = yf.Ticker(symbol)
         recommendation_key = ticker.info.get("recommendationKey")
-        trailing_pe = ticker.info.get("trailingPE")
+        trailing_pe = ticker.info.get("trailingPE") if ticker.info.get("trailingPE") else 0
         target_mean_price = ticker.info.get("targetMeanPrice")
         upside = (target_mean_price - data["price"]) / data["price"] * 100
         symbol = symbol.split(".")[0]
