@@ -1,0 +1,7 @@
+capital = 1000000  # Money to invest, used to calculate discreet amount of shares to buy
+risk_free_rate = 0.015  # risk free rate of return in decimal
+unusual_gain_warn = 5  # 5x
+# List of stocks to avoid
+blacklists = [
+    "STOCKNAME",
+]

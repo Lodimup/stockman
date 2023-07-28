@@ -1,5 +1,9 @@
 import pandas as pd
 from pypfopt.discrete_allocation import DiscreteAllocation
+from services.console import console
+from services.read_cfg import read_cfg
+
+CFG = read_cfg()
 
 
 def simple_backtest(
@@ -28,8 +32,13 @@ def simple_backtest(
     da = DiscreteAllocation(weights, buy_prices, total_portfolio_value=capital)
     allocation, leftover = da.lp_portfolio()
 
-    gain = 0
+    total_gain = 0
     for k, v in allocation.items():
-        gain += (sell_prices[k] - buy_prices[k]) * v
+        sell_price = sell_prices[k]
+        buy_price = buy_prices[k]
+        gain = (sell_price - buy_price) * v
+        total_gain += gain
+        if sell_price/buy_price > CFG['unusual_gain_warn']:
+            console.print(f"\n{k} {buy_date} {sell_date} {buy_price:.2f} {sell_price:.2f}", style="red")
 
-    return gain
+    return total_gain
