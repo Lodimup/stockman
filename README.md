@@ -1,6 +1,7 @@
 # stockman
+Calculates Modern Portfolio Theory's Efficient Frontier for a given set of stocks.
 ## Usage
-Config config.toml
+Edit config.toml
 ```
 poetry install
 cd app && poetry run python main.py
