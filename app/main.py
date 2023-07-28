@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -5,13 +6,14 @@ import yfinance as yf
 from pypfopt import EfficientFrontier, expected_returns, risk_models
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from rich import print
+from services.backtests.batch_simple_backtest import batch_simple_backtest
 from services.read_cfg import read_cfg
 from services.set100 import symbols
-from services.backtests.batch_simple_backtest import batch_simple_backtest
 
 CFG = read_cfg()
 RISK_FREE_RATE = CFG["risk_free_rate"]
 BLACKLISTS = CFG["blacklists"]
+OUT_PREFIX = int(time.time())
 
 
 def main():
@@ -28,6 +30,7 @@ def main():
     )
     df = df.fillna(method="bfill")
     df = df["Adj Close"]
+    df.to_csv(f"out/{OUT_PREFIX}-prices.csv")
 
     # Calculate expected returns and sample covariance
     mu = expected_returns.mean_historical_return(df)
@@ -58,8 +61,9 @@ def main():
         weights=weights,
         capital=CFG["capital"],
     )
-    backtest_res.to_csv("out/backtest.csv")
-
+    backtest_save_path = f"out/{OUT_PREFIX}-backtest.csv"
+    backtest_res.to_csv(backtest_save_path)
+    pd.DataFrame(report).T.to_csv(f"out/{OUT_PREFIX}-allocation.csv")
     # Report allocation
     print("-" * 80)
     excluded = ",".join(BLACKLISTS)
@@ -75,7 +79,7 @@ def main():
     # Report performance
     print("-" * 80)
     ef.portfolio_performance(verbose=True, risk_free_rate=RISK_FREE_RATE)
-    print('Backtest result saved to "out/backtest.csv"')
+    print(f'Backtest result saved to "{backtest_save_path}')
 
 
 if __name__ == "__main__":
