@@ -9,6 +9,9 @@ from rich import print
 from services.backtests.batch_simple_backtest import batch_simple_backtest
 from services.read_cfg import read_cfg
 from services.set100 import symbols
+from services.console import console
+from rich.table import Table
+
 
 CFG = read_cfg()
 RISK_FREE_RATE = CFG["risk_free_rate"]
@@ -56,30 +59,34 @@ def main():
         }
 
     # Backtest
-    backtest_res = batch_simple_backtest(
-        prices=df,
-        weights=weights,
-        capital=CFG["capital"],
-    )
-    backtest_save_path = f"out/{OUT_PREFIX}-backtest.csv"
-    backtest_res.to_csv(backtest_save_path)
-    pd.DataFrame(report).T.to_csv(f"out/{OUT_PREFIX}-allocation.csv")
+    if CFG["backtest"]:
+        backtest_res = batch_simple_backtest(
+            prices=df,
+            weights=weights,
+            capital=CFG["capital"],
+        )
+        backtest_save_path = f"out/{OUT_PREFIX}-backtest.csv"
+        backtest_res.to_csv(backtest_save_path)
+        pd.DataFrame(report).T.to_csv(f"out/{OUT_PREFIX}-allocation.csv")
+        print(f'Backtest result saved to "{backtest_save_path}')
     # Report allocation
+    table = Table(title="Allocation")
+    cols = ["Symbol", "Share", "Price", "Value", "Percentage"]
+    for col in cols:
+        table.add_column(col)
     print("-" * 80)
     excluded = ",".join(BLACKLISTS)
     print(f"Excluded: {excluded}")
-    print("Allocation:")
     total_cap_used = 0
     for symbol, data in report.items():
-        print(f"{symbol}: {data['share']:.0f} shares @ {data['price']:.2f} ฿ = {data['value']:,.2f} ฿")
+        table.add_row(symbol, f"{data['share']:.0f}", f"{data['price']:.2f}", f"{data['value']:,.2f}", f"{data['percentage']:.2f}")
         total_cap_used += data["value"]
+    console.print(table)
     print("-" * 80)
     print(f"Total capital used: {total_cap_used:,.2f}")
-    print("-" * 80)
     # Report performance
     print("-" * 80)
     ef.portfolio_performance(verbose=True, risk_free_rate=RISK_FREE_RATE)
-    print(f'Backtest result saved to "{backtest_save_path}')
 
 
 if __name__ == "__main__":
