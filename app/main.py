@@ -59,6 +59,7 @@ def main():
             "value": latest_prices[symbol] * share,
             "percentage": cleaned_weights[symbol]
         }
+    pd.DataFrame(report).T.to_csv(f"out/{OUT_PREFIX}-allocation.csv")
 
     # Backtest
     if CFG["backtest"]:
@@ -69,7 +70,6 @@ def main():
         )
         backtest_save_path = f"out/{OUT_PREFIX}-backtest.csv"
         backtest_res.to_csv(backtest_save_path)
-        pd.DataFrame(report).T.to_csv(f"out/{OUT_PREFIX}-allocation.csv")
         print(f'Backtest result saved to "{backtest_save_path}')
     # Report allocation
     table = Table(title="Allocation")
