@@ -6,3 +6,4 @@ unusual_gain_warn = 5  # 5x
 blacklists = [
     "STOCKNAME",
 ]
+select_from = []

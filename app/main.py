@@ -10,20 +10,26 @@ from rich.table import Table
 from services.backtests.batch_simple_backtest import batch_simple_backtest
 from services.console import console
 from services.read_cfg import read_cfg
-from services.set100 import symbols
+from services.setall import symbols
 
 CFG = read_cfg()
 RISK_FREE_RATE = CFG["risk_free_rate"]
 BLACKLISTS = CFG["blacklists"]
+SELECT_FROM = CFG["select_from"]
 OUT_PREFIX = int(time.time())
 SETTRADE_QUOTE_URL = 'https://www.settrade.com/th/equities/quote'
 
 
 def main():
     # Create list of symbols
-    tickers: list[str] = [
-        f"{symbol}.BK" for symbol in symbols() if symbol not in BLACKLISTS
-    ]
+    if len(SELECT_FROM) == 0:
+        tickers: list[str] = [
+            f"{symbol}.BK" for symbol in symbols() if symbol not in BLACKLISTS
+        ]
+    elif len(SELECT_FROM) > 0:
+        tickers: list[str] = [
+            f"{symbol}.BK" for symbol in SELECT_FROM if symbol not in BLACKLISTS
+        ]
 
     # Download historical data for the assets in the portfolio
     df: pd.DataFrame = yf.download(
