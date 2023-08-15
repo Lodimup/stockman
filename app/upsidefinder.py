@@ -1,5 +1,5 @@
 from tasks import download_data
-from services.set100 import symbols
+from services.setall import symbols
 from services.read_cfg import read_cfg
 import pandas as pd
 from rich import print, inspect
@@ -21,4 +21,4 @@ df['upside%'] = (df['targetMeanPrice'] - df['currentPrice']) / df['currentPrice'
 df = df[df['recommendationKey'] == 'buy']
 df = df.sort_values(by=['upside%'], ascending=False)
 print(df)
-df.to_csv(f'output/{today_str}_upside-finder.csv')
+df.to_csv(f'out/{today_str}_upside-finder.csv')
